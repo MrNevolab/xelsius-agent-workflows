@@ -27,21 +27,6 @@ PRODUCT_BLOCK = """PRODUKT-KONTEXT: xelsius LabWorkStation (nevoLAB), 10 unabhä
 
 OUTPUT_RULE = "ABGABE: Erstelle am Ende mit dem Outlook-Tool (draft_outlook_email) einen E-Mail-ENTWURF (nicht senden!) an " + RECIPIENT + ". Body als sauberes HTML mit inline CSS, klar getrennten Blöcken, gut lesbar. Formuliere alles auf Deutsch. Nutze die Kalenderwoche KW {kw} im Betreff und wo passend im Inhalt."
 
-
-def _prompt(tasks_name: str, extra: str, subject: str) -> dict:
-    """Baut Task-Spec aus Bausteinen."""
-    return {
-        "subject": subject,
-        "prompt": (
-            extra
-            + " "
-            + PRODUCT_BLOCK
-            + " "
-            + OUTPUT_RULE
-        ),
-    }
-
-
 TASKS = {}
 
 TASKS["trend_report"] = {
@@ -138,10 +123,13 @@ class XelsiusAgentInput(BaseModel):
 
 
 @workflows.activity()
-async def run_agent_task(task: str, iso_week: int) -> str:
+async def run_agent_task(task: str, iso_week: int | None) -> str:
     spec = TASKS.get(task)
     if spec is None:
         raise ValueError(f"Unbekannter Task: {task!r}. Erlaubt: {sorted(TASKS)}")
+
+    if not iso_week:
+        iso_week = datetime.now(TZ).isocalendar()[1]
 
     client = Mistral(api_key=_token())
     model = os.environ.get("XELSIUS_MODEL", "mistral-small-latest")
@@ -174,6 +162,4 @@ async def run_agent_task(task: str, iso_week: int) -> str:
 class XelsiusAgentWorkflow:
     @workflows.workflow.entrypoint
     async def run(self, input: XelsiusAgentInput) -> str:
-        now = datetime.now(TZ)
-        iso_week = input.iso_week or now.isocalendar()[1]
-        return await run_agent_task(input.task, iso_week)
+        return await run_agent_task(input.task, input.iso_week)
