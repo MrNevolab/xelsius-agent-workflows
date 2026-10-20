@@ -1,0 +1,10 @@
+[project]
+name = "xelsius-agent-workflows"
+version = "0.1.0"
+description = "Woechentliche xelsius Content- & Recherche-Agents als Mistral Workflow"
+requires-python = ">=3.12"
+dependencies = [
+    "mistralai>=3.10",
+    "mistralai-workflows>=3.10",
+    "pydantic>=2",
+]
