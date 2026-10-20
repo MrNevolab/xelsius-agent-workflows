@@ -1,19 +1,9 @@
-"""xelsius Agent-Team: Ein Workflow, mehrere geplante Aufgaben.
+"""xelsius Agent-Team: Ein Workflow, mehrere geplante Aufgaben."""
 
-Jede Aufgabe startet eine Mistral-Conversation mit den Tools
-`web_search` (Recherche) und dem `outlook`-Connector
-(E-Mail-Entwurf an schildwaechter@nevolab.de).
-"""
-
-import os
 from datetime import datetime
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel
-
 import mistralai.workflows as workflows
-from mistralai.client import Mistral
 
 RECIPIENT = "schildwaechter@nevolab.de"
 TZ = ZoneInfo("Europe/Berlin")
@@ -106,6 +96,9 @@ TASKS["smoke_test"] = {
 
 
 def _token() -> str:
+    import os
+    from pathlib import Path
+
     sa_path = os.environ.get("MISTRAL_SA_TOKEN_PATH")
     if sa_path and Path(sa_path).exists():
         return Path(sa_path).read_text(encoding="utf-8").strip()
@@ -123,6 +116,11 @@ async def run_agent_task(task: str, iso_week: int | None) -> str:
 
     if not iso_week:
         iso_week = datetime.now(TZ).isocalendar()[1]
+
+    # Schwere Imports bewusst LAZY (Temporal-Sandbox validiert das Modul beim Start)
+    import os
+
+    from mistralai.client import Mistral
 
     client = Mistral(api_key=_token())
     model = os.environ.get("XELSIUS_MODEL", "mistral-small-latest")
