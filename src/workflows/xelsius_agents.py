@@ -5,8 +5,6 @@ Jede Aufgabe startet eine Mistral-Conversation mit den Tools
 (E-Mail-Entwurf an schildwaechter@nevolab.de).
 """
 
-from __future__ import annotations
-
 import os
 from datetime import datetime
 from pathlib import Path
@@ -117,11 +115,6 @@ def _token() -> str:
     raise RuntimeError("Weder MISTRAL_SA_TOKEN_PATH noch MISTRAL_API_KEY sind gesetzt.")
 
 
-class XelsiusAgentInput(BaseModel):
-    task: str
-    iso_week: int | None = None
-
-
 @workflows.activity()
 async def run_agent_task(task: str, iso_week: int | None) -> str:
     spec = TASKS.get(task)
@@ -161,5 +154,5 @@ async def run_agent_task(task: str, iso_week: int | None) -> str:
 )
 class XelsiusAgentWorkflow:
     @workflows.workflow.entrypoint
-    async def run(self, input: XelsiusAgentInput) -> str:
-        return await run_agent_task(input.task, input.iso_week)
+    async def run(self, task: str, iso_week: int | None = None) -> str:
+        return await run_agent_task(task, iso_week)
