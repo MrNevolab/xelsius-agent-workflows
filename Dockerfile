@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir "mistralai>=3.10" "mistralai-workflows>=3.10" "pydantic>=2"
+RUN pip install --no-cache-dir "mistralai>=1.0" "mistralai-workflows>=3.10" "pydantic>=2"
 
 COPY src /app/src
 
