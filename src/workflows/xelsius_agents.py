@@ -131,7 +131,7 @@ async def run_agent_task(task: str, iso_week: int | None) -> str:
         inputs=[{"role": "user", "content": prompt}],
         tools=[
             {"type": "web_search"},
-            {"type": "connector", "connector_id": "outlook"},
+            {"type": "connector", "connector_id": "019df75b-9e4d-743e-b6ff-03337019b206"},
         ],
     )
 
